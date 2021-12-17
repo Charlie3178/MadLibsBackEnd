@@ -1,3 +1,4 @@
+from re import template
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -161,7 +162,6 @@ def update_template_by_id(id):
         madlib_to_update.template = template
 
     db.session.commit()
-
     return jsonify(one_template_schema.dump(madlib_to_update))
 
 
@@ -173,6 +173,7 @@ def delete_madlib_by_id(id):
     db.session.commit()
 
     return jsonify("Madlib successfully deleted")
+
 
 # GET endpoint for a single template
 @app.route("/template/get_id/<id>", methods=['GET'])
@@ -192,6 +193,12 @@ def get_template_by_title(title):
     return jsonify(one_template_schema.dump(Template.query.filter_by(title=title).first()))
 
 
+@app.route("/template/get_random", methods=['GET'])
+def get_random_template():
+    template_list = Template.query.all()
+    return jsonify(one_template_schema.dump(random.choice(template)))
+
+
 # GET endpoint for a random word by part of speech
 @app.route("/word/get/random", methods=['GET'])
 def get_random_word(part_of_speech):
@@ -199,6 +206,7 @@ def get_random_word(part_of_speech):
     if len(word_list) == 0:
         return jsonify(f"No words found for part of speech {part_of_speech}")
     return jsonify(one_word_schema.dump(random.choice(word_list)))
+
 
 # GET endpoint for all words
 @app.route("/word/get/all", methods=['GET'])
