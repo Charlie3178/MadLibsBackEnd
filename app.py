@@ -27,6 +27,7 @@ class Template(db.Model):
 
 
 class Word(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     word = db.Column(db.String(100), nullable=False)
     part_of_speech = db.Column(db.String(50), nullable=False)
 
