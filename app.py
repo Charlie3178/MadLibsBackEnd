@@ -2,13 +2,11 @@ from re import template
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_cors import CORS
 import random
 
 import os
 
 app = Flask(__name__)
-CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
 
@@ -30,7 +28,6 @@ class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     word = db.Column(db.String(100), nullable=False)
     part_of_speech = db.Column(db.String(50), nullable=False)
-
     def __init__(self, word, part_of_speech):
         self.word = word
         self.part_of_speech = part_of_speech
@@ -64,7 +61,7 @@ class CreatedLibsSchema(ma.Schema):
         fields = ('id', 'user_created_libs')
         
 one_user_created_libs = CreatedLibsSchema()
-multi_word_schema = CreatedLibsSchema(many=True)
+multi_user_created_libs_schema = CreatedLibsSchema(many=True)
         
 
 # POST endpoint for a single template
@@ -204,7 +201,7 @@ def update_user_created_libs():
 
     return jsonify(one_word_schema.dump(user_created_libs_to_update))
 
-#  DELETE endpoint to delete a record
+#  DELETE endpoint to delete template
 @app.route('/template/delete/<id>', methods=["DELETE"])
 def delete_madlib_by_id(id):
     madlib_to_delete = db.session.query(Template).filter(Template.id == id).first()
@@ -213,7 +210,7 @@ def delete_madlib_by_id(id):
 
     return jsonify("Madlib successfully deleted")
 
-
+# Delete endpoint for user created libs
 @app.route('/usercreatedlibs/delete/', methods=["DELETE"])
 def delete_user_created_libs_by_id(id):
     user_created_lib_to_delete = db.session.query(UserCreatedLibs).first()
@@ -221,6 +218,16 @@ def delete_user_created_libs_by_id(id):
     db.session.commit()
 
     return jsonify("Lib successfully deleted")
+
+# Delete endpoint for word
+@app.route('/word/delete/', methods=["DELETE"])
+def delete_word():
+    word_to_delete = db.session.query(Word).first()
+    db.session.delete(word_to_delete)
+    db.session.commit()
+
+    return jsonify("Word successfully deleted")
+
 
 # GET endpoint for a single template
 @app.route("/template/get_id/<id>", methods=['GET'])
@@ -241,7 +248,7 @@ def get_template_by_title(title):
 @app.route("/template/get_random", methods=['GET'])
 def get_random_template():
     template_list = Template.query.all()
-    return jsonify(one_template_schema.dump(random.choice(template_list)))
+    return jsonify(one_template_schema.dump(random.choice(template)))
 
 # GET endpoint for a random word by part of speech
 @app.route("/word/get/random", methods=['GET'])
@@ -258,10 +265,10 @@ def get_all_words():
     return jsonify(multi_word_schema.dump(Word.query.all()))
 
 
-# GET endpoint for word by word
-@app.route("/word/get/<word>", methods=['GET'])
-def get_word_by_word(word):
-    return jsonify(one_word_schema.dump(Word.query.filter_by(word=word).first()))
+# GET endpoint for all user created libs
+@app.route("/usercreatedlibs/all", methods=['GET'])
+def get_all_user_created_libs():
+    return jsonify(multi_user_created_libs_schema.dump(UserCreatedLibs.query.all()))
 
 
 if __name__ == "__main__":
