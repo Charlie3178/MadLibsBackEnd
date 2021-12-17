@@ -32,6 +32,13 @@ class Word(db.Model):
         self.word = word
         self.part_of_speech = part_of_speech
 
+class CreatedLibs(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    userCreatedLibs = db.Column(db.String())
+    
+    def __init__(self, id, userCreatedLibs ):
+        self.userCreatedLibs = userCreatedLibs
+    
 
 # schema
 class TemplateSchema(ma.Schema):
@@ -48,6 +55,14 @@ class WordSchema(ma.Schema):
 one_word_schema = WordSchema()
 multi_word_schema = WordSchema(many=True)
 
+class CreatedLibsSchema(ma.Schema):
+    
+    class Meta:
+        fields = ('id', 'userCreatedLibs')
+        
+one_user_created_libs = CreatedLibsSchema()
+multi_word_schema = CreatedLibsSchema(many=True)
+        
 
 # POST endpoint for a single template
 @app.route('/template/add', methods=['POST'])
@@ -130,7 +145,7 @@ def process_word(data):
 
 #  PUT endpoint to update a record
 @app.route('/template/update/<id>', methods=["PUT"])
-def update_movie_by_id(id):
+def update_template_by_id(id):
     if request.content_type != 'application/json':
         return jsonify('Error: Data must be sent as JSON')
 
@@ -143,7 +158,7 @@ def update_movie_by_id(id):
     if name != None:
         madlib_to_update.name = name
     if template != None:
-        madlib_to_update.genre = template
+        madlib_to_update.template = template
 
     db.session.commit()
 
@@ -156,6 +171,7 @@ def delete_madlib_by_id(id):
     madlib_to_delete = db.session.query(Template).filter(Template.id == id).first()
     db.session.delete(madlib_to_delete)
     db.session.commit()
+
     return jsonify("Madlib successfully deleted")
 
 # GET endpoint for a single template
