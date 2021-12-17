@@ -206,5 +206,10 @@ def get_all_words():
     return jsonify(multi_word_schema.dump(Word.query.all()))
 
 
+# GET endpoint for word by word
+@app.route("/word/get/<word>", methods=['GET'])
+def get_word_by_word(word):
+    return jsonify(one_word_schema.dump(Word.query.filter_by(word=word).first()))
+
 if __name__ == "__main__":
     app.run(debug=True)
