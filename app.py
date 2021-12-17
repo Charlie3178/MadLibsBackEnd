@@ -201,11 +201,6 @@ def update_user_created_libs():
 
     return jsonify(one_word_schema.dump(user_created_libs_to_update))
 
-
-
-
-
-
 #  DELETE endpoint to delete a record
 @app.route('/template/delete/<id>', methods=["DELETE"])
 def delete_madlib_by_id(id):
@@ -223,8 +218,6 @@ def delete_user_created_libs_by_id(id):
     db.session.commit()
 
     return jsonify("Lib successfully deleted")
-
-
 
 # GET endpoint for a single template
 @app.route("/template/get/<id>", methods=['GET'])
@@ -249,6 +242,8 @@ def get_random_word(part_of_speech):
 @app.route("/word/get/all", methods=['GET'])
 def get_all_words():
     return jsonify(multi_word_schema.dump(Word.query.all()))
+
+
 
 
 if __name__ == "__main__":
