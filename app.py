@@ -87,7 +87,45 @@ def process_template(data):
     db.session.commit()
 
     return new_template
-      
+
+
+# post endpoint for single word
+@app.route("/word/add", methods=['POST'])
+def add_word():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+    data = request.get_json()
+    return jsonify(one_word_schema.dump(process_word(data)))
+
+
+# post endpoint for multiple words
+@app.route("/word/add/many", methods=['POST'])
+def add_multi_words():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+    data = request.get_json()
+    word_list = []
+    for word in data:
+        word_list.append(process_word(word))
+    return jsonify(multi_word_schema.dump(word_list))
+
+
+# function for processing words
+def process_word(data):
+    word = data.get("word")
+    part_of_speech = data.get("part_of_speech")
+
+    if word == None:
+        return jsonify("Must include a word")
+    if part_of_speech == None:
+        return jsonify("Must include a part of speech")
+    
+    new_word = Word(word, part_of_speech)
+    db.session.add(new_word)
+    db.session.commit()
+
+    return new_word
+
 
 #  PUT endpoint to update a record
 @app.route('/template/update/<id>', methods=["PUT"])
