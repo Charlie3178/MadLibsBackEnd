@@ -14,7 +14,7 @@ ma = Marshmallow(app)
 # models
 class Template(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
     template = db.Column(db.Text, nullable=False)
 
     def __init__(self, name, template):
@@ -22,14 +22,30 @@ class Template(db.Model):
         self.template = template
 
 
+class Word(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    word = db.Column(db.String(100), nullable=False)
+    part_of_speech = db.Column(db.String(50), nullable=False)
+
+    def __init__(self, word, part_of_speech):
+        self.word = word
+        self.part_of_speech = part_of_speech
+
+
 # schema
 class TemplateSchema(ma.Schema):
     class Meta:
         fields = ('id', 'name', 'template')
 
-
 one_template_schema = TemplateSchema()
 multi_template_schema = TemplateSchema(many=True)
+
+class WordSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'word', 'part_of_speech')
+
+one_word_schema = WordSchema()
+multi_word_schema = WordSchema(many=True)
 
 
 # POST endpoint for a single template
