@@ -1,3 +1,4 @@
+from re import template
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -33,10 +34,10 @@ class Word(db.Model):
 
 class UserCreatedLibs(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    userCreatedLibs = db.Column(db.String())
+    user_created_libs = db.Column(db.Text)
     
-    def __init__(self, id, userCreatedLibs ):
-        self.userCreatedLibs = userCreatedLibs
+    def __init__(self, user_created_libs ):
+        self.user_created_libs = user_created_libs
     
 
 # schema
@@ -57,7 +58,7 @@ multi_word_schema = WordSchema(many=True)
 class CreatedLibsSchema(ma.Schema):
     
     class Meta:
-        fields = ('id', 'userCreatedLibs')
+        fields = ('id', 'user_created_libs')
         
 one_user_created_libs = CreatedLibsSchema()
 multi_word_schema = CreatedLibsSchema(many=True)
@@ -149,18 +150,17 @@ def update_template_by_id(id):
         return jsonify('Error: Data must be sent as JSON')
 
     put_data = request.get_json()
-    name = put_data.get('name')
+    title = put_data.get('title')
     template = put_data.get('template')
 
     madlib_to_update = db.session.query(Template).filter(Template.id == id).first()
 
-    if name != None:
-        madlib_to_update.name = name
+    if title != None:
+        madlib_to_update.title = title
     if template != None:
         madlib_to_update.template = template
 
     db.session.commit()
-
     return jsonify(one_template_schema.dump(madlib_to_update))
 
 @app.route('/word/update/', methods=["PUT"])
@@ -219,8 +219,12 @@ def delete_user_created_libs_by_id(id):
 
     return jsonify("Lib successfully deleted")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5c559b3cdd7440dbe75cced714df34d321174096
 # GET endpoint for a single template
-@app.route("/template/get/<id>", methods=['GET'])
+@app.route("/template/get_id/<id>", methods=['GET'])
 def get_template_by_id(id):
     return jsonify(one_template_schema.dump(Template.query.get(id)))
 
@@ -230,6 +234,16 @@ def get_template_by_id(id):
 def get_all_templates():
     return jsonify(multi_template_schema.dump(Template.query.all()))
 
+# GET endpoint for template by title
+@app.route("/template/get_title/<title>", methods=['GET'])
+def get_template_by_title(title):
+    return jsonify(one_template_schema.dump(Template.query.filter_by(title=title).first()))
+
+@app.route("/template/get_random", methods=['GET'])
+def get_random_template():
+    template_list = Template.query.all()
+    return jsonify(one_template_schema.dump(random.choice(template)))
+
 # GET endpoint for a random word by part of speech
 @app.route("/word/get/random", methods=['GET'])
 def get_random_word(part_of_speech):
@@ -238,13 +252,21 @@ def get_random_word(part_of_speech):
         return jsonify(f"No words found for part of speech {part_of_speech}")
     return jsonify(one_word_schema.dump(random.choice(word_list)))
 
+
 # GET endpoint for all words
 @app.route("/word/get/all", methods=['GET'])
 def get_all_words():
     return jsonify(multi_word_schema.dump(Word.query.all()))
 
 
+<<<<<<< HEAD
 
+=======
+# GET endpoint for word by word
+@app.route("/word/get/<word>", methods=['GET'])
+def get_word_by_word(word):
+    return jsonify(one_word_schema.dump(Word.query.filter_by(word=word).first()))
+>>>>>>> 5c559b3cdd7440dbe75cced714df34d321174096
 
 if __name__ == "__main__":
     app.run(debug=True)
