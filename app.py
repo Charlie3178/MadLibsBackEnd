@@ -51,3 +51,15 @@ def add_template():
     db.session.commit()
 
     return jsonify(one_template_schema.dump(new_template))
+
+
+# GET endpoint for a single template
+@app.route("template/get/<id>", methods=['GET'])
+def get_template_by_id(id):
+    return jsonify(one_template_schema.dump(Template.query.get(id)))
+
+
+# GET endpoint for all templates
+@app.route("template/get/all", methods=['GET'])
+def get_all_templates():
+    return jsonify(multi_template_schema.dump(Template.query.all()))
