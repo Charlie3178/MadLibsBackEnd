@@ -32,7 +32,7 @@ one_template_schema = TemplateSchema()
 multi_template_schema = TemplateSchema(many=True)
 
 # POST endpoint for a template
-@app.route('template/add', methods=['POST'])
+@app.route('/template/add', methods=['POST'])
 def add_template():
     if request.content_type != 'application/json':
         return jsonify('Error: Data must be sent as JSON')
