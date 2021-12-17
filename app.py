@@ -32,13 +32,32 @@ one_template_schema = TemplateSchema()
 multi_template_schema = TemplateSchema(many=True)
 
 
-# POST endpoint for a template
+# POST endpoint for a single template
 @app.route('/template/add', methods=['POST'])
 def add_template():
     if request.content_type != 'application/json':
         return jsonify('Error: Data must be sent as JSON')
 
     data = request.get_json()
+
+    return jsonify(one_template_schema.dump(process_template(data)))
+
+
+# POST endpoint for multiple templates
+@app.route('/template/add/many', methods=['POST'])
+def add_many_templates():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+    
+    data = request.get_json()
+    template_list = []
+    for template in data:
+        template_list.append(process_template(template))
+    return jsonify(multi_template_schema.dump(template_list))
+
+
+# function to actually deal with the templates
+def process_template(data):
     name = data.get("name")
     template = data.get("template")
 
@@ -51,9 +70,8 @@ def add_template():
     db.session.add(new_template)
     db.session.commit()
 
-    return jsonify(one_template_schema.dump(new_template))
-
-
+    return new_template
+      
 
 #  PUT endpoint to update a record
 @app.route('/template/update/<id>', methods=["PUT"])
