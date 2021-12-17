@@ -150,13 +150,13 @@ def update_template_by_id(id):
         return jsonify('Error: Data must be sent as JSON')
 
     put_data = request.get_json()
-    name = put_data.get('name')
+    title = put_data.get('title')
     template = put_data.get('template')
 
     madlib_to_update = db.session.query(Template).filter(Template.id == id).first()
 
-    if name != None:
-        madlib_to_update.name = name
+    if title != None:
+        madlib_to_update.title = title
     if template != None:
         madlib_to_update.template = template
 
