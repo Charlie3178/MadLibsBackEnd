@@ -14,11 +14,11 @@ ma = Marshmallow(app)
 # models
 class Template(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
     template = db.Column(db.Text, nullable=False)
 
-    def __init__(self, name, template):
-        self.name = name
+    def __init__(self, title, template):
+        self.title = title
         self.template = template
 
 
@@ -35,7 +35,7 @@ class Word(db.Model):
 # schema
 class TemplateSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'template')
+        fields = ('id', 'title', 'template')
 
 one_template_schema = TemplateSchema()
 multi_template_schema = TemplateSchema(many=True)
@@ -74,11 +74,11 @@ def add_many_templates():
 
 # function to actually deal with the templates
 def process_template(data):
-    name = data.get("name")
+    name = data.get("title")
     template = data.get("template")
 
     if name == None:
-        return jsonify("Must include a name key")
+        return jsonify("Must include a title key")
     if template == None:
         return jsonify("Must include a template key")
     
