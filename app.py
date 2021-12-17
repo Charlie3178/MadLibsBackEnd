@@ -18,3 +18,13 @@ class Template(db.Model):
 
     def __init__(self, template):
         self.template = template
+
+
+# schema
+class TemplateSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'template')
+
+
+one_template_schema = TemplateSchema()
+multi_template_schema = TemplateSchema(many=True)
