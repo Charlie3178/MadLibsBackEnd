@@ -24,7 +24,6 @@ class Template(db.Model):
 
 
 class Word(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
     word = db.Column(db.String(100), nullable=False)
     part_of_speech = db.Column(db.String(50), nullable=False)
 
@@ -50,7 +49,7 @@ multi_template_schema = TemplateSchema(many=True)
 
 class WordSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'word', 'part_of_speech')
+        fields = ('word', 'part_of_speech')
 
 one_word_schema = WordSchema()
 multi_word_schema = WordSchema(many=True)
@@ -164,6 +163,26 @@ def update_template_by_id(id):
 
     return jsonify(one_template_schema.dump(madlib_to_update))
 
+@app.route('/word/update/', methods=["PUT"])
+def update_word():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+
+    put_data = request.get_json()
+    word = put_data.get('word')
+    part_of_speach = put_data.get('part_of_speach')
+
+    madlib_to_update = db.session.query(part_of_speach).first()
+    madlib_to_update = db.session.query(word).first()
+
+    if word != None:
+        madlib_to_update.word = word
+    if part_of_speach != None:
+        madlib_to_update.template = part_of_speach
+
+    db.session.commit()
+
+    return jsonify(one_word_schema.dump(madlib_to_update))
 
 #  DELETE endpoint to delete a record
 @app.route('/template/delete/<id>', methods=["DELETE"])
@@ -173,6 +192,16 @@ def delete_madlib_by_id(id):
     db.session.commit()
 
     return jsonify("Madlib successfully deleted")
+
+@app.route('/word/delete/', methods=["DELETE"])
+def delete_word_by_id():
+    word_to_delete = db.session.query(Word).first()
+    db.session.delete(word_to_delete)
+    db.session.commit()
+
+    return jsonify("Word successfully deleted")
+
+
 
 # GET endpoint for a single template
 @app.route("/template/get_id/<id>", methods=['GET'])
