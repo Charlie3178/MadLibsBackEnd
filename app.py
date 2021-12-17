@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+import random
 
 import os
 
@@ -14,11 +15,11 @@ ma = Marshmallow(app)
 # models
 class Template(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
     template = db.Column(db.Text, nullable=False)
 
-    def __init__(self, name, template):
-        self.name = name
+    def __init__(self, title, template):
+        self.title = title
         self.template = template
 
 
@@ -41,7 +42,7 @@ class CreatedLibs(db.Model):
 # schema
 class TemplateSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'template')
+        fields = ('id', 'title', 'template')
 
 one_template_schema = TemplateSchema()
 multi_template_schema = TemplateSchema(many=True)
@@ -88,11 +89,11 @@ def add_many_templates():
 
 # function to actually deal with the templates
 def process_template(data):
-    name = data.get("name")
+    name = data.get("title")
     template = data.get("template")
 
     if name == None:
-        return jsonify("Must include a name key")
+        return jsonify("Must include a title key")
     if template == None:
         return jsonify("Must include a template key")
     
@@ -101,7 +102,45 @@ def process_template(data):
     db.session.commit()
 
     return new_template
-      
+
+
+# post endpoint for single word
+@app.route("/word/add", methods=['POST'])
+def add_word():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+    data = request.get_json()
+    return jsonify(one_word_schema.dump(process_word(data)))
+
+
+# post endpoint for multiple words
+@app.route("/word/add/many", methods=['POST'])
+def add_multi_words():
+    if request.content_type != 'application/json':
+        return jsonify('Error: Data must be sent as JSON')
+    data = request.get_json()
+    word_list = []
+    for word in data:
+        word_list.append(process_word(word))
+    return jsonify(multi_word_schema.dump(word_list))
+
+
+# function for processing words
+def process_word(data):
+    word = data.get("word")
+    part_of_speech = data.get("part_of_speech")
+
+    if word == None:
+        return jsonify("Must include a word")
+    if part_of_speech == None:
+        return jsonify("Must include a part of speech")
+    
+    new_word = Word(word, part_of_speech)
+    db.session.add(new_word)
+    db.session.commit()
+
+    return new_word
+
 
 #  PUT endpoint to update a record
 @app.route('/template/update/<id>', methods=["PUT"])
@@ -151,12 +190,44 @@ def delete_madlib_by_id(id):
     madlib_to_delete = db.session.query(Template).filter(Template.id == id).first()
     db.session.delete(madlib_to_delete)
     db.session.commit()
+
     return jsonify("Madlib successfully deleted")
 
 @app.route('/word/delete/', methods=["DELETE"])
-def delete_word():
+def delete_word_by_id():
     word_to_delete = db.session.query(Word).first()
     db.session.delete(word_to_delete)
     db.session.commit()
+
     return jsonify("Word successfully deleted")
 
+
+
+# GET endpoint for a single template
+@app.route("/template/get/<id>", methods=['GET'])
+def get_template_by_id(id):
+    return jsonify(one_template_schema.dump(Template.query.get(id)))
+
+
+# GET endpoint for all templates
+@app.route("/template/get/all", methods=['GET'])
+def get_all_templates():
+    return jsonify(multi_template_schema.dump(Template.query.all()))
+
+
+# GET endpoint for a random word by part of speech
+@app.route("/word/get/random", methods=['GET'])
+def get_random_word(part_of_speech):
+    word_list = Word.query.filter_by(part_of_speech=part_of_speech).all()
+    if len(word_list) == 0:
+        return jsonify(f"No words found for part of speech {part_of_speech}")
+    return jsonify(one_word_schema.dump(random.choice(word_list)))
+
+# GET endpoint for all words
+@app.route("/word/get/all", methods=['GET'])
+def get_all_words():
+    return jsonify(multi_word_schema.dump(Word.query.all()))
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
