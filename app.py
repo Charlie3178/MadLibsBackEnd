@@ -34,10 +34,10 @@ class Word(db.Model):
 
 class CreatedLibs(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    userCreatedLibs = db.Column(db.String())
+    user_created_libs = db.Column(db.Text)
     
-    def __init__(self, id, userCreatedLibs ):
-        self.userCreatedLibs = userCreatedLibs
+    def __init__(self, user_created_libs ):
+        self.user_created_libs = user_created_libs
     
 
 # schema
@@ -58,7 +58,7 @@ multi_word_schema = WordSchema(many=True)
 class CreatedLibsSchema(ma.Schema):
     
     class Meta:
-        fields = ('id', 'userCreatedLibs')
+        fields = ('id', 'user_created_libs')
         
 one_user_created_libs = CreatedLibsSchema()
 multi_word_schema = CreatedLibsSchema(many=True)
