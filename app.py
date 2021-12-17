@@ -33,7 +33,7 @@ multi_template_schema = TemplateSchema(many=True)
 
 
 # POST endpoint for a template
-@app.route('template/add', methods=['POST'])
+@app.route('/template/add', methods=['POST'])
 def add_template():
     if request.content_type != 'application/json':
         return jsonify('Error: Data must be sent as JSON')
@@ -52,6 +52,7 @@ def add_template():
     db.session.commit()
 
     return jsonify(one_template_schema.dump(new_template))
+
 
 
 #  PUT endpoint to update a record
@@ -83,3 +84,20 @@ def delete_madlib_by_id(id):
     db.session.delete(madlib_to_delete)
     db.session.commit()
     return jsonify("Madlib successfully deleted")
+
+# GET endpoint for a single template
+@app.route("/template/get/<id>", methods=['GET'])
+def get_template_by_id(id):
+    return jsonify(one_template_schema.dump(Template.query.get(id)))
+
+
+# GET endpoint for all templates
+@app.route("/template/get/all", methods=['GET'])
+def get_all_templates():
+    return jsonify(multi_template_schema.dump(Template.query.all()))
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
