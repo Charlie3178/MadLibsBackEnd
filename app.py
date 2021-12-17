@@ -219,10 +219,6 @@ def delete_user_created_libs_by_id(id):
 
     return jsonify("Lib successfully deleted")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5c559b3cdd7440dbe75cced714df34d321174096
 # GET endpoint for a single template
 @app.route("/template/get_id/<id>", methods=['GET'])
 def get_template_by_id(id):
@@ -259,14 +255,11 @@ def get_all_words():
     return jsonify(multi_word_schema.dump(Word.query.all()))
 
 
-<<<<<<< HEAD
-
-=======
 # GET endpoint for word by word
 @app.route("/word/get/<word>", methods=['GET'])
 def get_word_by_word(word):
     return jsonify(one_word_schema.dump(Word.query.filter_by(word=word).first()))
->>>>>>> 5c559b3cdd7440dbe75cced714df34d321174096
+
 
 if __name__ == "__main__":
     app.run(debug=True)
