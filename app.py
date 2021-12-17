@@ -175,7 +175,7 @@ def delete_madlib_by_id(id):
     return jsonify("Madlib successfully deleted")
 
 # GET endpoint for a single template
-@app.route("/template/get/<id>", methods=['GET'])
+@app.route("/template/get_id/<id>", methods=['GET'])
 def get_template_by_id(id):
     return jsonify(one_template_schema.dump(Template.query.get(id)))
 
@@ -184,6 +184,12 @@ def get_template_by_id(id):
 @app.route("/template/get/all", methods=['GET'])
 def get_all_templates():
     return jsonify(multi_template_schema.dump(Template.query.all()))
+
+
+# GET endpoint for template by title
+@app.route("/template/get_title/<title>", methods=['GET'])
+def get_template_by_title(title):
+    return jsonify(one_template_schema.dump(Template.query.filter_by(title=title).first()))
 
 
 # GET endpoint for a random word by part of speech
