@@ -2,11 +2,13 @@ from re import template
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 import random
 
 import os
 
 app = Flask(__name__)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
 
@@ -196,7 +198,7 @@ def get_template_by_title(title):
 @app.route("/template/get_random", methods=['GET'])
 def get_random_template():
     template_list = Template.query.all()
-    return jsonify(one_template_schema.dump(random.choice(template)))
+    return jsonify(one_template_schema.dump(random.choice(template_list)))
 
 
 # GET endpoint for a random word by part of speech
