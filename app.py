@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+import random
 
 import os
 
@@ -169,6 +170,18 @@ def get_all_templates():
     return jsonify(multi_template_schema.dump(Template.query.all()))
 
 
+# GET endpoint for a random word by part of speech
+@app.route("/word/get/random", methods=['GET'])
+def get_random_word(part_of_speech):
+    word_list = Word.query.filter_by(part_of_speech=part_of_speech).all()
+    if len(word_list) == 0:
+        return jsonify(f"No words found for part of speech {part_of_speech}")
+    return jsonify(one_word_schema.dump(random.choice(word_list)))
+
+# GET endpoint for all words
+@app.route("/word/get/all", methods=['GET'])
+def get_all_words():
+    return jsonify(multi_word_schema.dump(Word.query.all()))
 
 
 if __name__ == "__main__":
