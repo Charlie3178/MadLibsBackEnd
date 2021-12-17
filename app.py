@@ -156,6 +156,7 @@ def delete_madlib_by_id(id):
 @app.route('/word/delete/', methods=["DELETE"])
 def delete_word():
     word_to_delete = db.session.query(Word).first()
+    db.session.delete(word_to_delete)
     db.session.commit()
     return jsonify("Word successfully deleted")
 
