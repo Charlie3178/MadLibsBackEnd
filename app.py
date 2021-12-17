@@ -63,3 +63,9 @@ def get_template_by_id(id):
 @app.route("/template/get/all", methods=['GET'])
 def get_all_templates():
     return jsonify(multi_template_schema.dump(Template.query.all()))
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
